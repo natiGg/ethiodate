@@ -1,0 +1,37 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Environment variables (SECURITY RISK if committed!)
+.env
+.env.local
+.env.*
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+docker-compose.override.yml
+
+# Database / SQLite
+*.sqlite3
+*.db
+
+# Alembic
+alembic.ini.bak
+
+# OS generated files
+.DS_Store
+Thumbs.db
