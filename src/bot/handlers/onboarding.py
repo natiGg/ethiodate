@@ -155,8 +155,7 @@ async def process_gender(callback: CallbackQuery, state: FSMContext):
     
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text=get_string(lang, "btn_male"), callback_data="pref_male"),
-         InlineKeyboardButton(text=get_string(lang, "btn_female"), callback_data="pref_female")],
-        [InlineKeyboardButton(text=get_string(lang, "btn_both"), callback_data="pref_both")]
+         InlineKeyboardButton(text=get_string(lang, "btn_female"), callback_data="pref_female")]
     ])
     await callback.message.answer(get_string(lang, "ask_gender_pref"), reply_markup=kb)
     await state.set_state(Onboarding.gender_preference)
