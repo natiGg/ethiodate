@@ -303,27 +303,39 @@ async def process_bio(message: Message, state: FSMContext):
 @router.message(Onboarding.photos, F.photo)
 async def process_photo(message: Message, state: FSMContext):
     data = await state.get_data()
+    lang = get_lang(data)
     photos = data.get("photos", [])
     file_id = message.photo[-1].file_id
     photos.append(file_id)
     await state.update_data(photos=photos)
+    
+    if len(photos) >= 2:
+        kb = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text=get_string(lang, "btn_finish_register"), callback_data="finish_registration")]
+        ])
+        await message.answer(get_string(lang, "photo_received_done"), reply_markup=kb)
+    else:
+        await message.answer(get_string(lang, "photo_received_need_more"))
 
-@router.message(Onboarding.photos, Command("done"))
-async def process_photos_done(message: Message, state: FSMContext):
+@router.callback_query(Onboarding.photos, F.data == "finish_registration")
+async def process_photos_done(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     lang = get_lang(data)
+    message = callback.message
     
     if len(data.get("photos", [])) < 2:
-        await message.answer(get_string(lang, "ask_photos"))
+        await callback.answer(get_string(lang, "ask_photos"), show_alert=True)
         return
         
+    await callback.message.edit_reply_markup(reply_markup=None)
+    
     async with async_session_maker() as session:
-        user = await session.get(User, message.from_user.id)
+        user = await session.get(User, callback.from_user.id)
         if not user:
-            user = User(telegram_id=message.from_user.id)
+            user = User(telegram_id=callback.from_user.id)
             session.add(user)
             
-        user.telegram_username = message.from_user.username
+        user.telegram_username = callback.from_user.username
         user.name = data["name"]
         user.age = data["age"]
         user.gender = data["gender"]
@@ -338,12 +350,12 @@ async def process_photos_done(message: Message, state: FSMContext):
 
         # Delete old photos
         await session.execute(
-            Photo.__table__.delete().where(Photo.user_id == message.from_user.id)
+            Photo.__table__.delete().where(Photo.user_id == callback.from_user.id)
         )
         
         for i, file_id in enumerate(data["photos"]):
             photo = Photo(
-                user_id=message.from_user.id,
+                user_id=callback.from_user.id,
                 telegram_file_id=file_id,
                 sort_order=i,
                 is_primary=(i == 0)
@@ -353,3 +365,4 @@ async def process_photos_done(message: Message, state: FSMContext):
         
     await message.answer(get_string(lang, "profile_saved"), reply_markup=get_main_menu(lang))
     await state.clear()
+    await callback.answer()
