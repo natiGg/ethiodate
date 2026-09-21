@@ -4,6 +4,7 @@ class Settings(BaseSettings):
     bot_token: str
     database_url: str
     redis_url: str
+    admin_ids: str = "" # Comma separated list of admin telegram IDs
 
     model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
     
@@ -15,9 +16,14 @@ class Settings(BaseSettings):
         if "sslmode=" in url:
             url = url.replace("sslmode=", "ssl=")
         if "channel_binding=" in url:
-            # asyncpg doesn't support channel_binding query param
             import re
             url = re.sub(r'&?channel_binding=[^&]*', '', url)
         return url
+        
+    @property
+    def get_admin_ids(self) -> list[int]:
+        if not self.admin_ids:
+            return []
+        return [int(x.strip()) for x in self.admin_ids.split(",") if x.strip().isdigit()]
 
 settings = Settings()

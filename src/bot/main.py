@@ -41,8 +41,15 @@ async def main():
     )
     dp = Dispatcher()
 
-    from src.bot.handlers import onboarding, discovery, safety
-    dp.include_routers(onboarding.router, discovery.router, safety.router)
+    from src.bot.handlers import onboarding, discovery, safety, admin
+    from src.bot.middlewares.banned import BannedMiddleware
+    
+    # Register Middleware
+    dp.message.middleware(BannedMiddleware())
+    dp.callback_query.middleware(BannedMiddleware())
+    
+    # Register Routers
+    dp.include_routers(admin.router, onboarding.router, discovery.router, safety.router)
     
     # Start the dummy web server so Render's Web Service health check passes
     await start_dummy_server()
