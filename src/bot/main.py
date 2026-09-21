@@ -26,11 +26,6 @@ async def start_dummy_server():
     logging.info(f"Dummy web server started on port {port}")
 
 async def main():
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-    )
-    
     if settings.bot_token == "your_telegram_bot_token_here":
         logging.error("Please set a valid BOT_TOKEN in your .env file.")
         return
@@ -51,7 +46,19 @@ async def main():
     # Register Routers
     dp.include_routers(admin.router, onboarding.router, discovery.router, safety.router)
     
-    # Run database migrations automatically
+    # Start the dummy web server so Render's Web Service health check passes
+    await start_dummy_server()
+    
+    logging.info("Starting bot in polling mode...")
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    import logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+    )
+    
     logging.info("Running database migrations...")
     try:
         from alembic.config import Config
@@ -62,13 +69,6 @@ async def main():
     except Exception as e:
         logging.error(f"Failed to run database migrations: {e}")
 
-    # Start the dummy web server so Render's Web Service health check passes
-    await start_dummy_server()
-    
-    logging.info("Starting bot in polling mode...")
-    await dp.start_polling(bot)
-
-if __name__ == "__main__":
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
