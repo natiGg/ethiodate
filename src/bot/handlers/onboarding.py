@@ -33,13 +33,19 @@ async def cmd_start(message: Message, state: FSMContext):
     async with async_session_maker() as session:
         user = await session.get(User, message.from_user.id)
         if user:
-            await message.answer("You already have an account!", reply_markup=get_main_menu(user.language_pref))
+            from src.bot.locales import get_string
+            lang = user.language_pref
+            await message.answer(
+                f"Welcome back, {user.name}! 🌟\nUse the menu below to navigate.", 
+                reply_markup=get_main_menu(lang)
+            )
             return
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="English 🇺🇸", callback_data="lang_en"),
+        [InlineKeyboardButton(text="English 🇬🇧", callback_data="lang_en"),
          InlineKeyboardButton(text="አማርኛ 🇪🇹", callback_data="lang_am")]
     ])
+    from src.bot.locales import get_string
     await message.answer(get_string("en", "welcome"), reply_markup=kb)
     await state.set_state(Onboarding.language)
 

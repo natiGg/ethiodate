@@ -14,6 +14,9 @@ router = Router(name="discovery")
 from sqlalchemy import desc
 
 def format_profile(candidate: User, current_user: Optional[User] = None) -> str:
+    from src.bot.locales import get_string
+    lang = current_user.language_pref if current_user else "en"
+    
     caption = f"{candidate.name}, {candidate.age}\n"
     caption += f"📍 {candidate.current_city}, {candidate.current_country}\n"
     caption += f"🌍 From: {candidate.origin_region}\n\n"
@@ -22,15 +25,15 @@ def format_profile(candidate: User, current_user: Optional[User] = None) -> str:
         # Dynamic Shared Traits Highlight
         shared = []
         if candidate.current_city == current_user.current_city:
-            shared.append("📍 You both live in the same city!")
+            shared.append(get_string(lang, "shared_city"))
         elif candidate.current_country == current_user.current_country:
-            shared.append("📍 You both live in the same country!")
+            shared.append(get_string(lang, "shared_country"))
             
         if candidate.origin_region == current_user.origin_region:
-            shared.append("🌍 You are from the same origin region!")
+            shared.append(get_string(lang, "shared_origin"))
             
         if shared:
-            caption += "✨ **What you have in common:**\n"
+            caption += f"{get_string(lang, 'shared_title')}\n"
             for trait in shared:
                 caption += f"- {trait}\n"
             caption += "\n"
