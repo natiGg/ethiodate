@@ -117,6 +117,7 @@ async def send_candidate(message_or_call, lang: str, candidate: User, session, c
                 await message_or_call.message.edit_text(caption, reply_markup=kb, parse_mode="Markdown")
             except Exception:
                 pass
+@router.message(F.text.in_(["🔍 Discover", "🔍 አዲስ ሰዎችን ያግኙ"]))
 async def cmd_discover(message: Message, state: FSMContext):
     async with async_session_maker() as session:
         user = await session.get(User, message.from_user.id)
