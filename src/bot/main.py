@@ -52,7 +52,6 @@ async def main():
     dp.include_routers(admin.router, onboarding.router, discovery.router, safety.router)
     
     # Run database migrations automatically
-    import logging
     logging.info("Running database migrations...")
     try:
         from alembic.config import Config
