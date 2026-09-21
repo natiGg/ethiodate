@@ -51,6 +51,18 @@ async def main():
     # Register Routers
     dp.include_routers(admin.router, onboarding.router, discovery.router, safety.router)
     
+    # Run database migrations automatically
+    import logging
+    logging.info("Running database migrations...")
+    try:
+        from alembic.config import Config
+        from alembic import command
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
+        logging.info("Database migrations complete.")
+    except Exception as e:
+        logging.error(f"Failed to run database migrations: {e}")
+
     # Start the dummy web server so Render's Web Service health check passes
     await start_dummy_server()
     
