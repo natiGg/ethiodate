@@ -5,8 +5,7 @@ class Onboarding(StatesGroup):
     name = State()
     gender = State()
     gender_preference = State()
-    current_country = State()
-    current_city = State()
+    location = State() # Now covers both city and country via GPS
     origin_region = State()
     willing_to_relocate = State()
     dob_year = State()

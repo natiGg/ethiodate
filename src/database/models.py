@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, Integer, String, Enum as SQLAlchemyEnum
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, Integer, String, Float, Enum as SQLAlchemyEnum
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.sql import func
 import enum
@@ -27,6 +27,8 @@ class User(Base):
     gender_preference = Column(String, nullable=False)
     current_country = Column(String, nullable=False)
     current_city = Column(String, nullable=False)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
     origin_region = Column(String, nullable=False)
     willing_to_relocate = Column(Boolean, default=False)
     bio = Column(String)
